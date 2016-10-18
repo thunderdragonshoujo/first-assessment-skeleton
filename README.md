@@ -45,6 +45,8 @@ Update the `connect` command to accept `host` and `port` arguments so that the c
 
 3. Different message types should be displayed in different colors.
 
+4. Messages should appear in the same order and with the same timestamps for all connected clients.
+
 #### Message Display Format
 
 ```javascript
