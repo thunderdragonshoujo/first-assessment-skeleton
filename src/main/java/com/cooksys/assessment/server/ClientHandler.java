@@ -43,6 +43,21 @@ public class ClientHandler implements Runnable {
 		}
 		return sb.toString();
 	}
+	public void broadcastMessage(Message message)throws Exception {
+		ObjectMapper mapper = null;
+		//BufferedReader reader = null;
+		PrintWriter writer = null;
+		Socket socket = null;
+		for(int i = 0; i < connectedSockets.size(); i++) {   
+		    socket = connectedSockets.get(i);
+		     mapper = new ObjectMapper();
+			 //reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			 writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+			 String broadcastMesg = mapper.writeValueAsString(message);
+				writer.write(broadcastMesg);
+				writer.flush();
+		}
+	}
 
 	public void run() {
 		try {
@@ -74,9 +89,7 @@ public class ClientHandler implements Runnable {
 						break;
 					case "broadcast":
 						log.info("user <{}> broadcasted echoed message <{}>", message.getUsername(), message.getContents());
-						String speaker = mapper.writeValueAsString(message);
-						writer.write(speaker);
-						writer.flush();
+						broadcastMessage(message);
 						break;
 					case "Users":
 						log.info("user <{}> Users Listed <{}>", message.getUsername());
@@ -88,7 +101,7 @@ public class ClientHandler implements Runnable {
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Something went wrong :/", e);
 		}
 	}
