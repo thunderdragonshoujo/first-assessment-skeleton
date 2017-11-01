@@ -48,6 +48,12 @@ public class ClientHandler implements Runnable {
 						writer.write(response);
 						writer.flush();
 						break;
+					case "broadcast":
+						log.info("user <{}> echoed message <{}>", message.getUsername(), message.getContents());
+						String speaker = mapper.writeValueAsString(message);
+						writer.write(speaker);
+						writer.flush();
+						break;
 				}
 			}
 
