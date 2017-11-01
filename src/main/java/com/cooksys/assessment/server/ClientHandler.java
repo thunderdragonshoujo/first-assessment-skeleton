@@ -19,10 +19,12 @@ public class ClientHandler implements Runnable {
 
 	private Socket socket;
 	private static ArrayList<String> connectedUsers = new ArrayList<String>();
+	private static ArrayList<Socket> connectedSockets = new ArrayList<Socket>();
 
 	public ClientHandler(Socket socket) {
 		super();
 		this.socket = socket;
+		connectedSockets.add(socket);
 	}
 	public void printConnectedUsers(){
 		System.out.println("berfoe the loop" + connectedUsers.size());
@@ -71,13 +73,13 @@ public class ClientHandler implements Runnable {
 						writer.flush();
 						break;
 					case "broadcast":
-						log.info("user <{}> echoed message <{}>", message.getUsername(), message.getContents());
+						log.info("user <{}> broadcasted echoed message <{}>", message.getUsername(), message.getContents());
 						String speaker = mapper.writeValueAsString(message);
 						writer.write(speaker);
 						writer.flush();
 						break;
 					case "Users":
-						log.info("user <{}> echoed message <{}>", message.getUsername());
+						log.info("user <{}> Users Listed <{}>", message.getUsername());
 						message.setContents(listConnectedUsersAsString());
 						String userContent = mapper.writeValueAsString(message);
 						writer.write(userContent);
