@@ -84,10 +84,11 @@ public class ClientHandler implements Runnable {
 			while (!socket.isClosed()) {
 				String raw = reader.readLine();
 				Message message = mapper.readValue(raw, Message.class);
+				System.out.println("raw message is " + raw);
 
 				switch (message.getCommand()) {
 					case "connect":
-						log.info("user <{}> connected", message.getUsername());
+						log.info("user <{}> connected",message.getTimestamp() ,message.getUsername());
 						System.out.println("before" + connectedUsers.size());
 						connectedUsers.add (message.getUsername());
 						connectedSocketMap.put(message.getUsername(),socket);
@@ -97,6 +98,10 @@ public class ClientHandler implements Runnable {
 						break;
 					case "disconnect":
 						log.info("user <{}> disconnected", message.getUsername());
+						connectedUsers.remove(message.getUsername());
+						connectedSocketMap.remove(message.getUsername(),socket);
+						message.setContents(message.getUsername() + " has disconnected");
+						broadcastMessage(message);
 						this.socket.close();
 						break;
 					case "echo":
