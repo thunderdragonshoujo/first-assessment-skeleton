@@ -1,12 +1,13 @@
 package com.cooksys.assessment.server;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +20,11 @@ public class ClientHandler implements Runnable {
 
 	private Socket socket;
 	private static ArrayList<String> connectedUsers = new ArrayList<String>();
-	private static ArrayList<Socket> connectedSockets = new ArrayList<Socket>();
+	 private static Map<String, Socket> connectedSocketMap = new HashMap<String, Socket>();
 
 	public ClientHandler(Socket socket) {
 		super();
 		this.socket = socket;
-		connectedSockets.add(socket);
 	}
 	public void printConnectedUsers(){
 		System.out.println("berfoe the loop" + connectedUsers.size());
@@ -48,8 +48,8 @@ public class ClientHandler implements Runnable {
 		//BufferedReader reader = null;
 		PrintWriter writer = null;
 		Socket socket = null;
-		for(int i = 0; i < connectedSockets.size(); i++) {   
-		    socket = connectedSockets.get(i);
+		for(Map.Entry<String, Socket> connectedSocketMap : connectedSocketMap.entrySet()) {   
+		    socket = connectedSocketMap.getValue();
 		     mapper = new ObjectMapper();
 			 //reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			 writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -75,6 +75,7 @@ public class ClientHandler implements Runnable {
 						log.info("user <{}> connected", message.getUsername());
 						System.out.println("before" + connectedUsers.size());
 						connectedUsers.add (message.getUsername());
+						connectedSocketMap.put(message.getUsername(),socket);
 						System.out.println("after" + connectedUsers.size());
 						break;
 					case "disconnect":
