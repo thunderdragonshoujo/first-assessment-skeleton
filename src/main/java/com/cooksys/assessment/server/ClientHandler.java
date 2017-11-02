@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,8 @@ public class ClientHandler implements Runnable {
 		ObjectMapper mapper = null;
 		PrintWriter writer = null;
 		Socket socket = null;
+		java.util.Date date= new java.util.Date();
+	    System.out.println(new Timestamp(date.getTime()));
 		for(Map.Entry<String, Socket> connectedSocketMap : connectedSocketMap.entrySet()) {   
 		    socket = connectedSocketMap.getValue();
 		     mapper = new ObjectMapper();
@@ -73,6 +76,30 @@ public class ClientHandler implements Runnable {
 			}
 		}
 	}
+	
+	public static String printTimeStamp() {
+	    java.util.Date date= new java.util.Date();
+	    Timestamp ts = new Timestamp(date.getTime());
+	    return ts.toString();
+	}
+	
+	public static String getCommandNameToDisplay(String command) {
+		if(command.equals("echo") ) {
+			return "echo";
+		}
+		if(command.equals("broadcast") ) {
+			return "all";
+		}
+		if(command.equals("username") ) {
+			return "whisper";
+		}
+		if(command.equals("users") ) {
+			return "currently connected users";
+		}
+		return "";
+		
+	}
+
 
 	public void run() {
 		try {
@@ -88,25 +115,27 @@ public class ClientHandler implements Runnable {
 
 				switch (message.getCommand()) {
 					case "connect":
-						log.info("user <{}> connected",message.getTimestamp() ,message.getUsername());
+						log.info("user <{}> connected",message.getUsername());
 						System.out.println("before" + connectedUsers.size());
 						connectedUsers.add (message.getUsername());
 						connectedSocketMap.put(message.getUsername(),socket);
 						System.out.println("after" + connectedUsers.size());
-						message.setContents(message.getUsername() + " has connected");
+						message.setContents("has connected");
+						message.setTimeStamp (printTimeStamp());
 						broadcastMessage(message);
 						break;
 					case "disconnect":
 						log.info("user <{}> disconnected", message.getUsername());
 						connectedUsers.remove(message.getUsername());
 						connectedSocketMap.remove(message.getUsername(),socket);
-						message.setContents(message.getUsername() + " has disconnected");
+						message.setContents("has disconnected");
 						broadcastMessage(message);
 						this.socket.close();
 						break;
 					case "echo":
 						log.info("user <{}> echoed message <{}>", message.getUsername(), message.getContents());
 						String response = mapper.writeValueAsString(message);
+						System.out.println("response is " + response);
 						writer.write(response);
 						writer.flush();
 						break;

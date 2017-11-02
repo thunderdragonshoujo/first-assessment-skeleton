@@ -44,16 +44,16 @@ cli
 
 
     if (command === 'disconnect') {
-      server.end(new Message({timestamp, username, command }).toJSON() + '\n')
+      server.end(new Message({ username, command }).toJSON() + '\n')
     } else if (command === 'echo') {
-      server.write(new Message({timestamp, username, command, contents }).toJSON() + '\n')
+      server.write(new Message({username, command, contents }).toJSON() + '\n')
     } else if (command === 'broadcast'){
-      server.write(new Message({timestamp ,username, command, contents}).toJSON() + '\n')
+      server.write(new Message({username, command, contents}).toJSON() + '\n')
     } else if (command === 'users'){
         //server.write('Listing Users' + '\n')
-        server.write(new Message({timestamp ,username, command }).toJSON() + '\n')
+        server.write(new Message({username, command }).toJSON() + '\n')
      } else if (atUser == 'username'){
-      server.write(new Message({timestamp,atUser, command,contents}).toJSON() + '\n') 
+      server.write(new Message({atUser, command,contents}).toJSON() + '\n') 
     } else {
       this.log(`Command <${command}> was not recognized`)
     }
