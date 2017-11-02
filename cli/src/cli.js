@@ -33,15 +33,25 @@ cli
     const [ command, ...rest ] = words(input)
     const contents = rest.join(' ')
 
+    let atUser
+    if(command.startsWith('@')) {
+      console.log('it matches')
+     let atUser = command.replace('@','')
+     console.log(atUser)
+  }
+
+
     if (command === 'disconnect') {
       server.end(new Message({ username, command }).toJSON() + '\n')
     } else if (command === 'echo') {
       server.write(new Message({ username, command, contents }).toJSON() + '\n')
     } else if (command === 'broadcast'){
       server.write(new Message({username, command, contents}).toJSON() + '\n')
-    } else if (command === 'Users'){
+    } else if (command === 'users'){
         //server.write('Listing Users' + '\n')
         server.write(new Message({username, command }).toJSON() + '\n')
+     } else if (atUser == 'username'){
+      server.write(new Message({atUser, command,contents}).toJSON() + '\n') 
     } else {
       this.log(`Command <${command}> was not recognized`)
     }

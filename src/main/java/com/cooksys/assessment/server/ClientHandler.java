@@ -45,17 +45,32 @@ public class ClientHandler implements Runnable {
 	}
 	public void broadcastMessage(Message message)throws Exception {
 		ObjectMapper mapper = null;
-		//BufferedReader reader = null;
 		PrintWriter writer = null;
 		Socket socket = null;
 		for(Map.Entry<String, Socket> connectedSocketMap : connectedSocketMap.entrySet()) {   
 		    socket = connectedSocketMap.getValue();
 		     mapper = new ObjectMapper();
-			 //reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			 writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 			 String broadcastMesg = mapper.writeValueAsString(message);
 				writer.write(broadcastMesg);
 				writer.flush();
+		}
+	}
+	public void directMessage(Message message)throws Exception {
+		ObjectMapper mapper = null;
+		PrintWriter writer = null;
+		Socket socket = null;
+		String username = null;
+		for(Map.Entry<String, Socket> connectedSocketMap : connectedSocketMap.entrySet()) {
+			username = connectedSocketMap.getKey();
+			if(username == message.getUsername()) { 
+		    socket = connectedSocketMap.getValue();
+		     mapper = new ObjectMapper();
+			 writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+			 String directMsg = mapper.writeValueAsString(message);
+				writer.write(directMsg);
+				writer.flush();
+			}
 		}
 	}
 
@@ -77,6 +92,8 @@ public class ClientHandler implements Runnable {
 						connectedUsers.add (message.getUsername());
 						connectedSocketMap.put(message.getUsername(),socket);
 						System.out.println("after" + connectedUsers.size());
+						message.setContents(message.getUsername() + " has connected");
+						broadcastMessage(message);
 						break;
 					case "disconnect":
 						log.info("user <{}> disconnected", message.getUsername());
@@ -92,12 +109,17 @@ public class ClientHandler implements Runnable {
 						log.info("user <{}> broadcasted echoed message <{}>", message.getUsername(), message.getContents());
 						broadcastMessage(message);
 						break;
-					case "Users":
+					case "users":
 						log.info("user <{}> Users Listed <{}>", message.getUsername());
 						message.setContents(listConnectedUsersAsString());
 						String userContent = mapper.writeValueAsString(message);
 						writer.write(userContent);
 						writer.flush();
+						break;
+					case "@username":
+						log.info("user <{}> direct message to user <{}>", message.getUsername(), message.getContents());
+						log.info("raw is " + raw);
+						directMessage(message);
 						break;
 				}
 			}
