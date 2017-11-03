@@ -60,14 +60,19 @@ public class ClientHandler implements Runnable {
 		}
 	}
 	public void directMessage(Message message)throws Exception {
+		System.out.println("processing dm" + message.toString());
 		ObjectMapper mapper = null;
 		PrintWriter writer = null;
 		Socket socket = null;
-		String username = null;
-		for(Map.Entry<String, Socket> connectedSocketMap : connectedSocketMap.entrySet()) {
-			username = connectedSocketMap.getKey();
-			if(username == message.getUsername()) { 
-		    socket = connectedSocketMap.getValue();
+		String keyname = null;
+		for(Map.Entry<String, Socket> entry : connectedSocketMap.entrySet()) {
+			keyname = (String)entry.getKey();
+			System.out.println("DM ATTEMPT" + keyname + " " + message.getUsername());
+			if(keyname.equals (message.getUsername())) { 
+		    socket = (Socket) entry.getValue();
+		    System.out.println("SOCKET ATTEMPT" + socket + " " + message.getUsername());
+		    System.out.println("Message" + message.getContents());
+		    
 		     mapper = new ObjectMapper();
 			 writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 			 String directMsg = mapper.writeValueAsString(message);
