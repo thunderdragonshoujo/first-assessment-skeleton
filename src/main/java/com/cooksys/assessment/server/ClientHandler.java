@@ -90,7 +90,7 @@ public class ClientHandler implements Runnable {
 		if(command.equals("broadcast") ) {
 			return "all";
 		}
-		if(command.equals("username") ) {
+		if(command.equals("ATusername") ) {
 			return "whisper";
 		}
 		if(command.equals("users") ) {
@@ -150,7 +150,7 @@ public class ClientHandler implements Runnable {
 						writer.write(userContent);
 						writer.flush();
 						break;
-					case "@username":
+					case "username":
 						log.info("user <{}> direct message to user <{}>", message.getUsername(), message.getContents());
 						log.info("raw is " + raw);
 						directMessage(message);
