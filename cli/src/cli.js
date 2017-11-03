@@ -32,11 +32,11 @@ cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
 
 cli
-  .mode('connect <username>')
+  .mode('connect <username> <host> <port>')
   .delimiter(cli.chalk['green']('connected>'))
   .init(function (args, callback) {
     username = args.username
-    server = connect({ host:'localhost', port:'8080' }, () => {
+    server = connect({ host:args.host,port:args.port }, () => {
       server.write(new Message({ username, command: 'connect' }).toJSON() + '\n')
       callback()
     })
@@ -68,6 +68,7 @@ cli
     const [ command, ...rest ] = words(input)
     const contents = rest.join(' ')
     //console.log(input)
+
     lastCommand = command
 
 if(isDmCommand(input)){
@@ -78,7 +79,6 @@ if(isDmCommand(input)){
     if (command === 'disconnect') {
       server.end(new Message({ username, command }).toJSON() + '\n')
     } else if (command === 'echo') {
-      this.log(chalk.red('echo'))
       server.write(new Message({username, command, contents }).toJSON() + '\n')
     } else if (command === 'broadcast'){
       server.write(new Message({username, command, contents}).toJSON() + '\n')
@@ -88,9 +88,13 @@ if(isDmCommand(input)){
       server.write(new Message({username, command,contents}).toJSON() + '\n') 
     }else if (command == null || command == ''){
       let command = lastCommand
+      console.log('command was null' + lastCommand)
       server.write(new Message({username, command,contents}).toJSON() + '\n') 
     }else {
       this.log(`Command <${command}> was not recognized`)
+      console.log('trying last command ' + lastCommand)
+      let command = lastCommand
+        server.write(new Message({username, command,contents}).toJSON() + '\n')
     }
 
     callback()
